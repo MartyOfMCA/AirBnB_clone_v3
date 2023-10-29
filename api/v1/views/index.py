@@ -1,46 +1,28 @@
 #!/usr/bin/python3
-"""
-index
-"""
-
-from flask import jsonify
-from api.v1.views import app_views
-
+"""index.py"""
 from models import storage
+from api.v1.views import app_views
+from flask import jsonify
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
-@app_views.route("/status", methods=['GET'], strict_slashes=False)
+@app_views.route("/status", strict_slashes=False)
 def status():
-    """
-    status route
-    :return: response with json
-    """
-    data = {
-        "status": "OK"
-    }
-
-    resp = jsonify(data)
-    resp.status_code = 200
-
-    return resp
+    """Returns status"""
+    return jsonify({"status": "OK"})
 
 
-@app_views.route("/stats", methods=['GET'], strict_slashes=False)
+@app_views.route("/stats")
 def stats():
-    """
-    stats of all objs route
-    :return: json of all objs
-    """
-    data = {
-        "amenities": storage.count("Amenity"),
-        "cities": storage.count("City"),
-        "places": storage.count("Place"),
-        "reviews": storage.count("Review"),
-        "states": storage.count("State"),
-        "users": storage.count("User"),
-    }
-
-    resp = jsonify(data)
-    resp.status_code = 200
-
-    return resp
+    """counts and returns each table values"""
+    classes = {"amenities": Amenity, "cities": City, "places": Place,
+               "reviews": Review, "states": State, "users": User}
+    stats_dict = {}
+    for key, value in classes.items():
+        stats_dict[key] = storage.count(value)
+    return jsonify(stats_dict)
