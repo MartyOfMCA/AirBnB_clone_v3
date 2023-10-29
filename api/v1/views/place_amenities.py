@@ -22,7 +22,7 @@ def get_place_amenities(place_id):
     coll = []
     if storage_type == 'db':
         amenity = [amenity.to_dict() for amenity in place.amenities]
-        coll.append(amenity)
+        coll.extend(amenity)
     else:
         for amenity_id in place.amenity_ids:
             amenity = storage.get(Amenity, amenity_id)
@@ -30,7 +30,8 @@ def get_place_amenities(place_id):
     return jsonify(coll)
 
 
-@app_views.route("/places/<place_id>/amenities/<amenity_id>", methods=['DELETE'],
+@app_views.route("/places/<place_id>/amenities/<amenity_id>",
+                 methods=['DELETE'],
                  strict_slashes=False)
 def delete_place_amenity(place_id, amenity_id):
     """Deletes a Amenity object to a Place"""
@@ -66,7 +67,7 @@ def create_place_amenity(place_id, amenity_id):
         if amenity in place.amenities:
             return jsonify(amenity.to_dict()), 200
         place.amenities.append(amenity)
-    
+
     else:
         if amenity_id in place.amenity_ids:
             return jsonify(amenity.to_dict()), 200
