@@ -28,7 +28,6 @@ class DBStorage:
     def __init__(self):
         """Instantiate a DBStorage object"""
         HBNB_MYSQL_USER = getenv('HBNB_MYSQL_USER')
-
         HBNB_MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
         HBNB_MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
         HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
@@ -38,7 +37,6 @@ class DBStorage:
                                              HBNB_MYSQL_PWD,
                                              HBNB_MYSQL_HOST,
                                              HBNB_MYSQL_DB))
-
         if HBNB_ENV == "test":
             Base.metadata.drop_all(self.__engine)
 
@@ -78,10 +76,17 @@ class DBStorage:
         self.__session.remove()
 
     def get(self, cls, id):
-        """ Gets an object from DB """
-        cls_name = "{}.{}".format(cls.__name__, id)
-        return self.all(cls).get(cls_name, None)
+        """A method to retrieve one object"""
+        if cls in classes.values() and id and type(id) == str:
+            db_obj = self.all(cls)
+            for key, val in db_obj.items():
+                if key.split(".")[1] == id:
+                    return val
+        return None
 
     def count(self, cls=None):
-        """ Counts the number of objects in storage """
-        return len(self.all(cls)) if cls else len(self.all())
+        """Returns the number of objects in storage matching"""
+        data = self.all(cls)
+        if cls in classes.values():
+            data = self.all(cls)
+        return len(data)
